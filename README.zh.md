@@ -43,7 +43,7 @@
 
 ##### 2.4 将相芯美颜需要的资源文件拷贝到项目的 [**Resource/**](Resource/) 目录下
 
-* [点击此处下载demo需要的资源文件包-8.11.0](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.0_Resource.zip)
+* [点击此处下载demo需要的资源文件包-8.11.1](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.1_Extension_for_Resource.tar.gz)
 
 ![xxx](https://web-cdn.agora.io/docs-files/1673335775613)
 
@@ -53,8 +53,8 @@
 
 ##### 2.6 下载插件 android-release.aar 文件, 并拷贝到项目 [**android/libs/**](android/libs/) 目录下
 
-* [点击此处下载demo需要的Android插件aar-8.11.0](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.0_Extension_for_Android_v4.3.2-1.tar.gz)
-* [点击此处下载demo需要的IOS插件framework-8.11.0](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.0_Extension_for_iOS_v4.3.2-1.tar.gz)
+* [点击此处下载demo需要的Android插件aar-8.11.1](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.1_Extension_for_Android_v4.3.2-1.tar.gz)
+* [点击此处下载demo需要的IOS插件framework-8.11.1](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.1_Extension_for_iOS_v4.3.2-1.tar.gz)
 
 
 

@@ -12,7 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:permission_handler/permission_handler.dart';
 
-const rtcAppId = '<Your_AppID>'; //----------------- Need DIY ------------------
+const rtcAppId = '<Your_AppID>'; //------------ Need DIY -------------
 
 // REMINDER: Update this value for ai_face_processor.bundle if the FaceUnity sdk be updated.
 const aiFaceProcessorType = 1 << 8;
@@ -29,13 +29,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'fu_v8.11.0 + RTC 4.3.2',
+      title: 'fu_v8.11.1 + RTC 4.3.2',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('fu_v8.11.0 + RTC 4.3.2'),
+          title: const Text('fu_v8.11.1 + RTC 4.3.2'),
           backgroundColor: Colors.amber,
           foregroundColor: Colors.white,
         ),
