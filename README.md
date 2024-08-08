@@ -37,7 +37,7 @@
 
 ##### 2.4 Copy the necessary resource files to the [**Resource/**](Resource/) directory of the project.
 
-* [Click here to download the resource file package required for the demo](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.0_Resource.zip)
+* [Click here to download the resource file package required for the demo-v8.11.0](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.0_Resource.zip)
 
 ![xxx](https://web-cdn.agora.io/docs-files/1673335775613)
 
@@ -47,8 +47,8 @@
 
 ##### 2.6 Download the **android-release.aar** file of the extension and copy it to the [**android/libs/**](android/libs/)directory of the project.
 
-* [Click here to download the extension aar required for Android demo](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.0_Extension_for_Android_v4.3.2-1.tar.gz)
-* [Click here to download the extension framework required for IOS demo](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.0_Extension_for_iOS_v4.3.2-1.tar.gz)
+* [Click here to download the extension aar required for Android demo-v8.11.0](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.0_Extension_for_Android_v4.3.2-1.tar.gz)
+* [Click here to download the extension framework required for IOS demo-v8.11.0](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.0_Extension_for_iOS_v4.3.2-1.tar.gz)
 
 <img src="https://web-cdn.agora.io/docs-files/1673335651833" alt="xxx" style="zoom:50%;" />
 

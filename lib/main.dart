@@ -12,7 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:permission_handler/permission_handler.dart';
 
-const rtcAppId = '<Your_AppID>'; //----------------- step 1 ------------------
+const rtcAppId = '<Your_AppID>'; //----------------- Need DIY ------------------
 
 // REMINDER: Update this value for ai_face_processor.bundle if the FaceUnity sdk be updated.
 const aiFaceProcessorType = 1 << 8;
@@ -245,7 +245,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _setComposerStuff(
       String bundlePath, double colorValue, double filterValue) async {
     final path = await _copyAsset(bundlePath);
-    //瘦脸
+    //Face slimming effects - 瘦脸
     await _rtcEngine.setExtensionProperty(
         provider: 'FaceUnity',
         extension: 'Effect',
@@ -266,7 +266,8 @@ class _MyHomePageState extends State<MyHomePage> {
           'value': 0.5,
         }));
     //
-    //滤镜
+
+    //Filter - 滤镜
     await _rtcEngine.setExtensionProperty(
         provider: 'FaceUnity',
         extension: 'Effect',
@@ -287,7 +288,8 @@ class _MyHomePageState extends State<MyHomePage> {
           'value': filterValue,
         }));
     //
-    //红润
+
+    //Beauty - 美颜_红润
     await _rtcEngine.setExtensionProperty(
         provider: 'FaceUnity',
         extension: 'Effect',
@@ -297,6 +299,7 @@ class _MyHomePageState extends State<MyHomePage> {
           'name': "color_level",
           'value': colorValue,
         }));
+    //
   }
 
   Future<void> _initFUExtension() async {

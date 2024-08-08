@@ -1,7 +1,7 @@
 # 相芯美颜插件快速开始
 
 > 本文档主要介绍如何快速跑通 <mark>相芯美颜插件</mark> Flutter 示例工程
->
+>参考文档：https://doc.shengwang.cn/doc/marketplace/flutter/integrate-extensions/faceunity-ar
 > 其他语言版本: [**English**](README.md)
 ---
 
