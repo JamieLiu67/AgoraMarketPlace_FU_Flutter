@@ -102,7 +102,7 @@ List<int> gAuthPackage = []; // Need To Replace
 ### 3.3 Demo效果
 
 > <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/market-place/FaceUnity/FaceUnity-effect-3.jpg.jpg" style="zoom:20%;">
-> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/market-place/FaceUnity/FaceUnity-effect-4.jpg.jpg" style="zoom:20%;>
+> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/market-place/FaceUnity/FaceUnity-effect-4.jpg.jpg" style="zoom:20%;">
 > 
 > ---
 >
