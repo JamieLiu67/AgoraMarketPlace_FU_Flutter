@@ -109,9 +109,10 @@ class _MyHomePageState extends State<MyHomePage> {
     ));
 
     _rtcEngineEventHandler = RtcEngineEventHandler(
-      onExtensionEvent: (provider, extension, key, value) {
+      onExtensionEventWithContext:
+          (ExtensionContext context, String key, String value) {
         debugPrint(
-            '[onExtensionEvent] provider: $provider, extension: $extension, key: $key, value: $value');
+            '[onExtensionEventWithContext] ExtensionContext: $context, key: $key, value: $value');
 
         final jsonObj = jsonDecode(value);
 
@@ -129,16 +130,18 @@ class _MyHomePageState extends State<MyHomePage> {
           });
         }
       },
-      onExtensionStarted: (provider, extension) {
+      onExtensionStartedWithContext: (ExtensionContext context) {
         debugPrint(
-            '[onExtensionStarted] provider: $provider, extension: $extension');
-        if (provider == 'FaceUnity' && extension == 'Effect') {
+            '[onExtensionStartedWithContext] ExtensionContext: $context');
+        if (context.providerName == 'FaceUnity' &&
+            context.extensionName == 'Effect') {
           _initFUExtension();
         }
       },
-      onExtensionError: (provider, extension, error, message) {
+      onExtensionErrorWithContext:
+          (ExtensionContext context, int error, String message) {
         debugPrint(
-            '[onExtensionError] provider: $provider, extension: $extension, error: $error, message: $message');
+            '[onExtensionErrorWithContext] ExtensionContext: $context, error: $error, message: $message');
       },
     );
     _rtcEngine.registerEventHandler(_rtcEngineEventHandler);
