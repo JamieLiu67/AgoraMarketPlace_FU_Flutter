@@ -12,7 +12,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:permission_handler/permission_handler.dart';
 
-const rtcAppId = 'Your owner appid'; //------------ Need DIY -------------
+const rtcAppId =
+    '59535f1fe3e64f3b864ae7a55bbd3196'; //------------ Need DIY -------------
 
 // REMINDER: Update this value for ai_face_processor.bundle if the FaceUnity sdk be updated.
 const aiFaceProcessorType = 1 << 8;
@@ -29,12 +30,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('fu_v8.11.1'),
+          title: const Text('FaceUnity Extension Example'),
           backgroundColor: Colors.amber,
           foregroundColor: Colors.white,
         ),
@@ -56,21 +54,23 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late final RtcEngine _rtcEngine;
   late final RtcEngineEventHandler _rtcEngineEventHandler;
+
   bool _isReadyPreview = false;
   bool _enableExtension = true;
   bool _enableAITracking = false;
   bool _enableSticker = false;
   bool _enableComposer = false;
+
   double _colorLevel = 0.5;
   double _filterLevel = 0.5;
 
   int _facesNum = 0;
   int _handsNum = 0;
   int _peopleNum = 0;
+  int rtcEnginebuild = 0;
 
   String rtcEngineVersion = 'None';
   String fuVersion = 'None';
-  int rtcEnginebuild = 0;
 
   Future<String> _copyAsset(String assetPath) async {
     ByteData data = await rootBundle.load(assetPath);
@@ -266,19 +266,8 @@ class _MyHomePageState extends State<MyHomePage> {
         value: jsonEncode({
           'obj_handle': path,
           'name': "cheek_thinning",
-          'value': 0.35,
-        }));
-
-    await _rtcEngine.setExtensionProperty(
-        provider: 'FaceUnity',
-        extension: 'Effect',
-        key: 'fuItemSetParam',
-        value: jsonEncode({
-          'obj_handle': path,
-          'name': "cheek_v",
           'value': 0.5,
         }));
-    //
 
     //Filter - 滤镜
     await _rtcEngine.setExtensionProperty(
