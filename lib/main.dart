@@ -12,7 +12,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:permission_handler/permission_handler.dart';
 
-const rtcAppId = 'Your APPID'; //------------ Need DIY -------------
+const rtcAppId =
+    '59535f1fe3e64f3b864ae7a55bbd3196'; //------------ Need DIY -------------
 
 // REMINDER: Update this value for ai_face_processor.bundle if the FaceUnity sdk be updated.
 const aiFaceProcessorType = 1 << 8;
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Faceunity - Extension'),
+          title: const Text('FaceUnity Extension Example'),
           backgroundColor: Colors.amber,
           foregroundColor: Colors.white,
         ),
@@ -53,21 +54,23 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late final RtcEngine _rtcEngine;
   late final RtcEngineEventHandler _rtcEngineEventHandler;
+
   bool _isReadyPreview = false;
   bool _enableExtension = true;
   bool _enableAITracking = false;
   bool _enableSticker = false;
   bool _enableComposer = false;
+
   double _colorLevel = 0.5;
   double _filterLevel = 0.5;
 
   int _facesNum = 0;
   int _handsNum = 0;
   int _peopleNum = 0;
-
-  String rtcEngineVersion = 'Init engine to get get version';
-  String fuVersion = 'Enable effect to get veison';
   int rtcEnginebuild = 0;
+
+  String rtcEngineVersion = 'None';
+  String fuVersion = 'None';
 
   Future<String> _copyAsset(String assetPath) async {
     ByteData data = await rootBundle.load(assetPath);
@@ -109,9 +112,10 @@ class _MyHomePageState extends State<MyHomePage> {
     ));
 
     _rtcEngineEventHandler = RtcEngineEventHandler(
-      onExtensionEvent: (provider, extension, key, value) {
+      onExtensionEventWithContext:
+          (ExtensionContext context, String key, String value) {
         debugPrint(
-            '[onExtensionEvent] provider: $provider, extension: $extension, key: $key, value: $value');
+            '[onExtensionEventWithContext] ExtensionContext: $context, key: $key, value: $value');
 
         final jsonObj = jsonDecode(value);
 
@@ -129,20 +133,22 @@ class _MyHomePageState extends State<MyHomePage> {
           });
         }
       },
-      onExtensionStarted: (provider, extension) {
+      onExtensionStartedWithContext: (ExtensionContext context) {
         debugPrint(
-            '[onExtensionStarted] provider: $provider, extension: $extension');
-        if (provider == 'FaceUnity' && extension == 'Effect') {
+            '[onExtensionStartedWithContext] ExtensionContext: $context');
+        if (context.providerName == 'FaceUnity' &&
+            context.extensionName == 'Effect') {
           _initFUExtension();
         }
       },
-      onExtensionError: (provider, extension, error, message) {
+      onExtensionErrorWithContext:
+          (ExtensionContext context, int error, String message) {
         debugPrint(
-            '[onExtensionError] provider: $provider, extension: $extension, error: $error, message: $message');
+            '[onExtensionErrorWithContext] ExtensionContext: $context, error: $error, message: $message');
       },
     );
     _rtcEngine.registerEventHandler(_rtcEngineEventHandler);
-    _loadVersion();
+    await _loadVersion();
 
     // On Android, you should load libAgoraFaceUnityExtension.so explicitly
     if (Platform.isAndroid) {
@@ -260,19 +266,8 @@ class _MyHomePageState extends State<MyHomePage> {
         value: jsonEncode({
           'obj_handle': path,
           'name': "cheek_thinning",
-          'value': 0.35,
-        }));
-
-    await _rtcEngine.setExtensionProperty(
-        provider: 'FaceUnity',
-        extension: 'Effect',
-        key: 'fuItemSetParam',
-        value: jsonEncode({
-          'obj_handle': path,
-          'name': "cheek_v",
           'value': 0.5,
         }));
-    //
 
     //Filter - 滤镜
     await _rtcEngine.setExtensionProperty(
@@ -362,192 +357,187 @@ class _MyHomePageState extends State<MyHomePage> {
           direction: Axis.horizontal,
           children: [
             Expanded(flex: 1, child: Container()),
-            SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'Agora RTC SDK: $rtcEngineVersion($rtcEnginebuild)',
-                    textAlign: TextAlign.left,
-                    style: const TextStyle(
-                        color: Colors.white70, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    'FaceUnity SDK: $fuVersion',
-                    textAlign: TextAlign.left,
-                    style: const TextStyle(
-                        color: Colors.white70, fontWeight: FontWeight.bold),
-                  ),
-                  _enableAITracking
-                      ? Text(
-                          "faces: $_facesNum",
-                          textAlign: TextAlign.left,
-                          style: const TextStyle(
-                              color: Colors.white70,
-                              fontWeight: FontWeight.bold),
-                        )
-                      : Container(),
-                  _enableAITracking
-                      ? Text(
-                          "hands: $_handsNum",
-                          textAlign: TextAlign.left,
-                          style: const TextStyle(
-                              color: Colors.white70,
-                              fontWeight: FontWeight.bold),
-                        )
-                      : Container(),
-                  _enableAITracking
-                      ? Text(
-                          "people: $_peopleNum",
-                          textAlign: TextAlign.left,
-                          style: const TextStyle(
-                              color: Colors.white70,
-                              fontWeight: FontWeight.bold),
-                        )
-                      : Container(),
-                  TextButton(
-                    style: TextButton.styleFrom(foregroundColor: Colors.blue),
-                    onPressed: () async {
-                      setState(() {
-                        _enableExtension = !_enableExtension;
-                      });
+            Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  'Agora RTC SDK: $rtcEngineVersion($rtcEnginebuild)',
+                  textAlign: TextAlign.left,
+                  style: const TextStyle(
+                      color: Colors.white70, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'FaceUnity SDK: $fuVersion',
+                  textAlign: TextAlign.left,
+                  style: const TextStyle(
+                      color: Colors.white70, fontWeight: FontWeight.bold),
+                ),
+                _enableAITracking
+                    ? Text(
+                        "faces: $_facesNum",
+                        textAlign: TextAlign.left,
+                        style: const TextStyle(
+                            color: Colors.white70, fontWeight: FontWeight.bold),
+                      )
+                    : Container(),
+                _enableAITracking
+                    ? Text(
+                        "hands: $_handsNum",
+                        textAlign: TextAlign.left,
+                        style: const TextStyle(
+                            color: Colors.white70, fontWeight: FontWeight.bold),
+                      )
+                    : Container(),
+                _enableAITracking
+                    ? Text(
+                        "people: $_peopleNum",
+                        textAlign: TextAlign.left,
+                        style: const TextStyle(
+                            color: Colors.white70, fontWeight: FontWeight.bold),
+                      )
+                    : Container(),
+                TextButton(
+                  style: TextButton.styleFrom(foregroundColor: Colors.blue),
+                  onPressed: () async {
+                    setState(() {
+                      _enableExtension = !_enableExtension;
+                    });
 
-                      await _rtcEngine.enableExtension(
-                          provider: "FaceUnity",
-                          extension: "Effect",
-                          enable: _enableExtension);
-                    },
-                    child: Text(_enableExtension
-                        ? 'disableExtension'
-                        : 'enableExtension'),
-                  ),
-                  TextButton(
-                    style: TextButton.styleFrom(foregroundColor: Colors.blue),
-                    onPressed: () async {
-                      setState(() {
-                        _enableAITracking = !_enableAITracking;
-                      });
+                    await _rtcEngine.enableExtension(
+                        provider: "FaceUnity",
+                        extension: "Effect",
+                        enable: _enableExtension);
+                  },
+                  child: Text(_enableExtension
+                      ? 'disableExtension'
+                      : 'enableExtension'),
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(foregroundColor: Colors.blue),
+                  onPressed: () async {
+                    setState(() {
+                      _enableAITracking = !_enableAITracking;
+                    });
 
-                      if (_enableAITracking) {
-                        await _rtcEngine.setExtensionProperty(
-                            provider: 'FaceUnity',
-                            extension: 'Effect',
-                            key: 'fuSetMaxFaces',
-                            value: jsonEncode({
-                              'n': 5,
-                            }));
+                    if (_enableAITracking) {
+                      await _rtcEngine.setExtensionProperty(
+                          provider: 'FaceUnity',
+                          extension: 'Effect',
+                          key: 'fuSetMaxFaces',
+                          value: jsonEncode({
+                            'n': 5,
+                          }));
 
-                        await _rtcEngine.setExtensionProperty(
-                            provider: 'FaceUnity',
-                            extension: 'Effect',
-                            key: 'fuIsTracking',
-                            value: jsonEncode({
-                              'enable': true,
-                            }));
+                      await _rtcEngine.setExtensionProperty(
+                          provider: 'FaceUnity',
+                          extension: 'Effect',
+                          key: 'fuIsTracking',
+                          value: jsonEncode({
+                            'enable': true,
+                          }));
 
-                        await _rtcEngine.setExtensionProperty(
-                            provider: 'FaceUnity',
-                            extension: 'Effect',
-                            key: 'fuHumanProcessorGetNumResults',
-                            value: jsonEncode({
-                              'enable': true,
-                            }));
+                      await _rtcEngine.setExtensionProperty(
+                          provider: 'FaceUnity',
+                          extension: 'Effect',
+                          key: 'fuHumanProcessorGetNumResults',
+                          value: jsonEncode({
+                            'enable': true,
+                          }));
 
-                        await _rtcEngine.setExtensionProperty(
-                            provider: 'FaceUnity',
-                            extension: 'Effect',
-                            key: 'fuHumanProcessorSetMaxHumans',
-                            value: jsonEncode({
-                              'max_humans': 5,
-                            }));
+                      await _rtcEngine.setExtensionProperty(
+                          provider: 'FaceUnity',
+                          extension: 'Effect',
+                          key: 'fuHumanProcessorSetMaxHumans',
+                          value: jsonEncode({
+                            'max_humans': 5,
+                          }));
 
-                        await _rtcEngine.setExtensionProperty(
-                            provider: 'FaceUnity',
-                            extension: 'Effect',
-                            key: 'fuHandDetectorGetResultNumHands',
-                            value: jsonEncode({
-                              'enable': true,
-                            }));
-                      }
-                    },
-                    child: Text(_enableAITracking
-                        ? 'disableAITracking'
-                        : 'enableAITracking'),
-                  ),
-                  TextButton(
-                    style: TextButton.styleFrom(foregroundColor: Colors.cyan),
-                    onPressed: () async {
-                      setState(() {
-                        _enableSticker = !_enableSticker;
-                      });
+                      await _rtcEngine.setExtensionProperty(
+                          provider: 'FaceUnity',
+                          extension: 'Effect',
+                          key: 'fuHandDetectorGetResultNumHands',
+                          value: jsonEncode({
+                            'enable': true,
+                          }));
+                    }
+                  },
+                  child: Text(_enableAITracking
+                      ? 'disableAITracking'
+                      : 'enableAITracking'),
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(foregroundColor: Colors.cyan),
+                  onPressed: () async {
+                    setState(() {
+                      _enableSticker = !_enableSticker;
+                    });
 
-                      if (_enableSticker) {
-                        _enableStickerEffect(
-                            'Resource/effect/normal/cat_sparks.bundle');
-                      } else {
-                        _disableStickerEffect(
-                            'Resource/effect/normal/cat_sparks.bundle');
-                      }
-                    },
-                    child: Text(
-                        _enableSticker ? 'disableSticker' : 'enableSticker'),
-                  ),
-                  TextButton(
-                    style: TextButton.styleFrom(foregroundColor: Colors.yellow),
-                    onPressed: () async {
-                      setState(() {
-                        _enableComposer = !_enableComposer;
-                      });
+                    if (_enableSticker) {
+                      _enableStickerEffect(
+                          'Resource/effect/normal/cat_sparks.bundle');
+                    } else {
+                      _disableStickerEffect(
+                          'Resource/effect/normal/cat_sparks.bundle');
+                    }
+                  },
+                  child:
+                      Text(_enableSticker ? 'disableSticker' : 'enableSticker'),
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(foregroundColor: Colors.yellow),
+                  onPressed: () async {
+                    setState(() {
+                      _enableComposer = !_enableComposer;
+                    });
 
-                      if (_enableComposer) {
-                        _enableComposerEffect(
-                            'Resource/graphics/face_beautification.bundle');
-                        _setComposerStuff(
-                            'Resource/graphics/face_beautification.bundle',
-                            _colorLevel,
-                            _filterLevel);
-                      } else {
-                        _disableComposerEffect(
-                            'Resource/graphics/face_beautification.bundle');
-                      }
-                    },
-                    child: Text(
-                        _enableComposer ? 'disableComposer' : 'enableComposer'),
-                  ),
-                  const Text('Color Level:', textAlign: TextAlign.left),
-                  Slider(
-                      value: _colorLevel,
-                      onChanged: _enableComposer
-                          ? (double value) async {
-                              setState(() {
-                                _colorLevel = value;
-                              });
+                    if (_enableComposer) {
+                      _enableComposerEffect(
+                          'Resource/graphics/face_beautification.bundle');
+                      _setComposerStuff(
+                          'Resource/graphics/face_beautification.bundle',
+                          _colorLevel,
+                          _filterLevel);
+                    } else {
+                      _disableComposerEffect(
+                          'Resource/graphics/face_beautification.bundle');
+                    }
+                  },
+                  child: Text(
+                      _enableComposer ? 'disableComposer' : 'enableComposer'),
+                ),
+                const Text('Color Level:', textAlign: TextAlign.left),
+                Slider(
+                    value: _colorLevel,
+                    onChanged: _enableComposer
+                        ? (double value) async {
+                            setState(() {
+                              _colorLevel = value;
+                            });
 
-                              _setComposerStuff(
-                                  'Resource/graphics/face_beautification.bundle',
-                                  _colorLevel,
-                                  _filterLevel);
-                            }
-                          : null),
-                  const Text('Filter Level:', textAlign: TextAlign.left),
-                  Slider(
-                      value: _filterLevel,
-                      onChanged: _enableComposer
-                          ? (double value) async {
-                              setState(() {
-                                _filterLevel = value;
-                              });
+                            _setComposerStuff(
+                                'Resource/graphics/face_beautification.bundle',
+                                _colorLevel,
+                                _filterLevel);
+                          }
+                        : null),
+                const Text('Filter Level:', textAlign: TextAlign.left),
+                Slider(
+                    value: _filterLevel,
+                    onChanged: _enableComposer
+                        ? (double value) async {
+                            setState(() {
+                              _filterLevel = value;
+                            });
 
-                              _setComposerStuff(
-                                  'Resource/graphics/face_beautification.bundle',
-                                  _colorLevel,
-                                  _filterLevel);
-                            }
-                          : null),
-                ],
-              ),
+                            _setComposerStuff(
+                                'Resource/graphics/face_beautification.bundle',
+                                _colorLevel,
+                                _filterLevel);
+                          }
+                        : null),
+              ],
             ),
           ],
         ),

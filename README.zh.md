@@ -3,11 +3,15 @@
 > 其他语言版本: [**English**](README.md)
 
 
-# 8.11.1 - 4.3.2【最新版本】
+# 8.11.1 - 4.5.0【最新版本】
+* [点击此处下载demo需要的资源文件包-8.11.1](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.1_Extension_for_Resource.tar.gz)
+* [点击此处下载demo需要的Android插件aar-8.11.1](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.1_Extension_for_Android_v4.5.0-1.tar.gz)
+* [点击此处下载demo需要的IOS插件framework-8.11.1](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.1_Extension_for_iOS_v4.5.0-1.tar.gz)
+---
+# 8.11.1 - 4.3.2
 * [点击此处下载demo需要的资源文件包-8.11.1](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.1_Extension_for_Resource.tar.gz)
 * [点击此处下载demo需要的Android插件aar-8.11.1](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.1_Extension_for_Android_v4.3.2-1.tar.gz)
 * [点击此处下载demo需要的IOS插件framework-8.11.1](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.1_Extension_for_iOS_v4.3.2-1.tar.gz)
-
 ---
 # 8.11.0 - 4.3.2
 * [点击此处下载demo需要的资源文件包-8.11.0](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.0_Resource.zip)
