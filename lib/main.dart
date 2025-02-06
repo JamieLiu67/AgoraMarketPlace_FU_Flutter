@@ -20,6 +20,13 @@ const aiFaceProcessorType = 1 << 8;
 const aiHandProcessorType = 1 << 3;
 const aiHumanProcessorType = 1 << 9;
 
+const beautyPath = 'Resource/graphics/face_beautification.bundle';
+const stickerPath = 'Resource/effect/normal/cat_sparks.bundle';
+const aiFaceProcessorPath = 'Resource/model/ai_face_processor.bundle';
+const aiHandProcessorPath = 'Resource/model/ai_hand_processor.bundle';
+const aiHumanProcessorPath = 'Resource/model/ai_human_processor.bundle';
+const aiTypePath = 'Resource/others/aitype.bundle';
+
 void main() {
   runApp(const MyApp());
 }
@@ -33,7 +40,7 @@ class MyApp extends StatelessWidget {
       home: Scaffold(
         appBar: AppBar(
           title: const Text('FaceUnity Extension Example'),
-          backgroundColor: Colors.amber,
+          backgroundColor: Colors.blueAccent,
           foregroundColor: Colors.white,
         ),
         body: const MyHomePage(),
@@ -69,37 +76,14 @@ class _MyHomePageState extends State<MyHomePage> {
   int _peopleNum = 0;
   int rtcEnginebuild = 0;
 
-  String rtcEngineVersion = 'None';
-  String fuVersion = 'None';
+  String rtcEngineVersion = 'Loading...';
+  String fuVersion = 'Loading...';
 
-  Future<String> _copyAsset(String assetPath) async {
-    ByteData data = await rootBundle.load(assetPath);
-    List<int> bytes =
-        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+  @override
+  void initState() {
+    super.initState();
 
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-
-    final dirname = path.dirname(assetPath);
-
-    Directory dstDir = Directory(path.join(appDocDir.path, dirname));
-    if (!(await dstDir.exists())) {
-      await dstDir.create(recursive: true);
-    }
-
-    String p = path.join(appDocDir.path, path.basename(assetPath));
-    final file = File(p);
-    if (!(await file.exists())) {
-      await file.create();
-      await file.writeAsBytes(bytes);
-    }
-
-    return file.absolute.path;
-  }
-
-  Future<void> _requestPermissionIfNeed() async {
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      await [Permission.microphone, Permission.camera].request();
-    }
+    _init();
   }
 
   Future<void> _init() async {
@@ -152,11 +136,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // On Android, you should load libAgoraFaceUnityExtension.so explicitly
     if (Platform.isAndroid) {
-      await _rtcEngine.loadExtensionProvider(path: 'AgoraFaceUnityExtension');
+      await _rtcEngine.loadExtensionProvider(
+          path: 'AgoraFaceUnityExtension', unloadAfterUse: false);
     }
     // BugFixed: U should call enableExtension True first;
-    await _rtcEngine.enableExtension(
-        provider: "FaceUnity", extension: "Effect", enable: true);
     await _rtcEngine.enableExtension(
         provider: "FaceUnity", extension: "Effect", enable: _enableExtension);
 
@@ -168,140 +151,16 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future<void> _requestPermissionIfNeed() async {
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      await [Permission.microphone, Permission.camera].request();
+    }
+  }
+
   Future<void> _loadVersion() async {
     var sdkversion = await _rtcEngine.getVersion();
     rtcEngineVersion = sdkversion.version ?? 'None';
     rtcEnginebuild = sdkversion.build ?? 0;
-  }
-
-  Future<void> _loadAIModels() async {
-    final aiFaceProcessorPath =
-        await _copyAsset('Resource/model/ai_face_processor.bundle');
-    await _rtcEngine.setExtensionProperty(
-        provider: 'FaceUnity',
-        extension: 'Effect',
-        key: 'fuLoadAIModelFromPackage',
-        value: jsonEncode(
-            {'data': aiFaceProcessorPath, 'type': aiFaceProcessorType}));
-
-    final aiHandProcessorPath =
-        await _copyAsset('Resource/model/ai_hand_processor.bundle');
-    await _rtcEngine.setExtensionProperty(
-        provider: 'FaceUnity',
-        extension: 'Effect',
-        key: 'fuLoadAIModelFromPackage',
-        value: jsonEncode(
-            {'data': aiHandProcessorPath, 'type': aiHandProcessorType}));
-
-    final aiHumanProcessorPath =
-        await _copyAsset('Resource/model/ai_human_processor.bundle');
-    await _rtcEngine.setExtensionProperty(
-        provider: 'FaceUnity',
-        extension: 'Effect',
-        key: 'fuLoadAIModelFromPackage',
-        value: jsonEncode(
-            {'data': aiHumanProcessorPath, 'type': aiHumanProcessorType}));
-
-    final aitypePath = await _copyAsset('Resource/others/aitype.bundle');
-    await _rtcEngine.setExtensionProperty(
-        provider: 'FaceUnity',
-        extension: 'Effect',
-        key: 'fuCreateItemFromPackage',
-        value: jsonEncode({'data': aitypePath}));
-    await _rtcEngine.setExtensionProperty(
-        provider: 'FaceUnity',
-        extension: 'Effect',
-        key: 'fuItemSetParam',
-        value: jsonEncode({
-          'obj_handle': aitypePath,
-          'name': "aitype",
-          "value": 1 << 8 | 16777216 | 1 << 4 | 1 << 9 | 1 << 30 | 1 << 3,
-        }));
-  }
-
-  Future<void> _enableStickerEffect(String stickerPath) async {
-    final stickerRealPath = await _copyAsset(stickerPath);
-    await _rtcEngine.setExtensionProperty(
-        provider: 'FaceUnity',
-        extension: 'Effect',
-        key: 'fuCreateItemFromPackage',
-        value: jsonEncode({'data': stickerRealPath}));
-  }
-
-  Future<void> _disableStickerEffect(String stickerPath) async {
-    final stickerRealPath = await _copyAsset(stickerPath);
-    await _rtcEngine.setExtensionProperty(
-        provider: 'FaceUnity',
-        extension: 'Effect',
-        key: 'fuDestroyItem',
-        value: jsonEncode({'item': stickerRealPath}));
-  }
-
-  Future<void> _enableComposerEffect(String bundlePath) async {
-    final bundleRealPath = await _copyAsset(bundlePath);
-    await _rtcEngine.setExtensionProperty(
-        provider: 'FaceUnity',
-        extension: 'Effect',
-        key: 'fuCreateItemFromPackage',
-        value: jsonEncode({'data': bundleRealPath}));
-  }
-
-  Future<void> _disableComposerEffect(String bundlePath) async {
-    final bundleRealPath = await _copyAsset(bundlePath);
-    await _rtcEngine.setExtensionProperty(
-        provider: 'FaceUnity',
-        extension: 'Effect',
-        key: 'fuDestroyItem',
-        value: jsonEncode({'item': bundleRealPath}));
-  }
-
-  Future<void> _setComposerStuff(
-      String bundlePath, double colorValue, double filterValue) async {
-    final path = await _copyAsset(bundlePath);
-    //Face slimming effects - 瘦脸
-    await _rtcEngine.setExtensionProperty(
-        provider: 'FaceUnity',
-        extension: 'Effect',
-        key: 'fuItemSetParam',
-        value: jsonEncode({
-          'obj_handle': path,
-          'name': "cheek_thinning",
-          'value': 0.5,
-        }));
-
-    //Filter - 滤镜
-    await _rtcEngine.setExtensionProperty(
-        provider: 'FaceUnity',
-        extension: 'Effect',
-        key: 'fuItemSetParam',
-        value: jsonEncode({
-          'obj_handle': path,
-          'name': "filter_name",
-          'value': "gexing11",
-        }));
-
-    await _rtcEngine.setExtensionProperty(
-        provider: 'FaceUnity',
-        extension: 'Effect',
-        key: 'fuItemSetParam',
-        value: jsonEncode({
-          'obj_handle': path,
-          'name': "filter_level",
-          'value': filterValue,
-        }));
-    //
-
-    //Beauty - 美颜_红润
-    await _rtcEngine.setExtensionProperty(
-        provider: 'FaceUnity',
-        extension: 'Effect',
-        key: 'fuItemSetParam',
-        value: jsonEncode({
-          'obj_handle': path,
-          'name': "color_level",
-          'value': colorValue,
-        }));
-    //
   }
 
   Future<void> _initFUExtension() async {
@@ -321,16 +180,46 @@ class _MyHomePageState extends State<MyHomePage> {
     _loadAIModels();
   }
 
-  Future<void> _dispose() async {
-    _rtcEngine.unregisterEventHandler(_rtcEngineEventHandler);
-    await _rtcEngine.release();
-  }
+  Future<void> _loadAIModels() async {
+    final aiFaceProcessorRealPath = await _copyAsset(aiFaceProcessorPath);
+    await _rtcEngine.setExtensionProperty(
+        provider: 'FaceUnity',
+        extension: 'Effect',
+        key: 'fuLoadAIModelFromPackage',
+        value: jsonEncode(
+            {'data': aiFaceProcessorRealPath, 'type': aiFaceProcessorType}));
 
-  @override
-  void initState() {
-    super.initState();
+    final aiHandProcessorRealPath = await _copyAsset(aiHandProcessorPath);
+    await _rtcEngine.setExtensionProperty(
+        provider: 'FaceUnity',
+        extension: 'Effect',
+        key: 'fuLoadAIModelFromPackage',
+        value: jsonEncode(
+            {'data': aiHandProcessorRealPath, 'type': aiHandProcessorType}));
 
-    _init();
+    final aiHumanProcessorRealPath = await _copyAsset(aiHumanProcessorPath);
+    await _rtcEngine.setExtensionProperty(
+        provider: 'FaceUnity',
+        extension: 'Effect',
+        key: 'fuLoadAIModelFromPackage',
+        value: jsonEncode(
+            {'data': aiHumanProcessorRealPath, 'type': aiHumanProcessorType}));
+
+    final aiTypeRealPath = await _copyAsset(aiTypePath);
+    await _rtcEngine.setExtensionProperty(
+        provider: 'FaceUnity',
+        extension: 'Effect',
+        key: 'fuCreateItemFromPackage',
+        value: jsonEncode({'data': aiTypeRealPath}));
+    await _rtcEngine.setExtensionProperty(
+        provider: 'FaceUnity',
+        extension: 'Effect',
+        key: 'fuItemSetParam',
+        value: jsonEncode({
+          'obj_handle': aiTypeRealPath,
+          'name': "aitype",
+          "value": 1 << 8 | 16777216 | 1 << 4 | 1 << 9 | 1 << 30 | 1 << 3,
+        }));
   }
 
   @override
@@ -339,209 +228,312 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
+  Future<void> _dispose() async {
+    _rtcEngine.unregisterEventHandler(_rtcEngineEventHandler);
+    await _rtcEngine.release();
+  }
+
+  Future<String> _copyAsset(String assetPath) async {
+    ByteData data = await rootBundle.load(assetPath);
+    List<int> bytes =
+        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+
+    final dirname = path.dirname(assetPath);
+
+    Directory dstDir = Directory(path.join(appDocDir.path, dirname));
+    if (!(await dstDir.exists())) {
+      await dstDir.create(recursive: true);
+    }
+
+    String p = path.join(appDocDir.path, path.basename(assetPath));
+    final file = File(p);
+    if (!(await file.exists())) {
+      await file.create();
+      await file.writeAsBytes(bytes);
+    }
+
+    return file.absolute.path;
+  }
+
+  Future<void> _enableStickerEffect() async {
+    final stickerRealPath = await _copyAsset(stickerPath);
+    await _rtcEngine.setExtensionProperty(
+        provider: 'FaceUnity',
+        extension: 'Effect',
+        key: 'fuCreateItemFromPackage',
+        value: jsonEncode({'data': stickerRealPath}));
+  }
+
+  Future<void> _disableStickerEffect() async {
+    final stickerRealPath = await _copyAsset(stickerPath);
+    await _rtcEngine.setExtensionProperty(
+        provider: 'FaceUnity',
+        extension: 'Effect',
+        key: 'fuDestroyItem',
+        value: jsonEncode({'item': stickerRealPath}));
+  }
+
+  Future<void> _enableComposerEffect() async {
+    final bundleRealPath = await _copyAsset(beautyPath);
+    await _rtcEngine.setExtensionProperty(
+        provider: 'FaceUnity',
+        extension: 'Effect',
+        key: 'fuCreateItemFromPackage',
+        value: jsonEncode({'data': bundleRealPath}));
+  }
+
+  Future<void> _disableComposerEffect() async {
+    final bundleRealPath = await _copyAsset(beautyPath);
+    await _rtcEngine.setExtensionProperty(
+        provider: 'FaceUnity',
+        extension: 'Effect',
+        key: 'fuDestroyItem',
+        value: jsonEncode({'item': bundleRealPath}));
+  }
+
+  Future<void> _setComposerStuff(double colorValue, double filterValue) async {
+    final bundleRealPath = await _copyAsset(beautyPath);
+    //Face slimming effects - 瘦脸
+    await _rtcEngine.setExtensionProperty(
+        provider: 'FaceUnity',
+        extension: 'Effect',
+        key: 'fuItemSetParam',
+        value: jsonEncode({
+          'obj_handle': bundleRealPath,
+          'name': "cheek_thinning",
+          'value': 0.5,
+        }));
+
+    //Filter - 滤镜
+    await _rtcEngine.setExtensionProperty(
+        provider: 'FaceUnity',
+        extension: 'Effect',
+        key: 'fuItemSetParam',
+        value: jsonEncode({
+          'obj_handle': bundleRealPath,
+          'name': "filter_name",
+          'value': "gexing11",
+        }));
+
+    await _rtcEngine.setExtensionProperty(
+        provider: 'FaceUnity',
+        extension: 'Effect',
+        key: 'fuItemSetParam',
+        value: jsonEncode({
+          'obj_handle': bundleRealPath,
+          'name': "filter_level",
+          'value': filterValue,
+        }));
+    //
+
+    //Beauty - 美颜_红润
+    await _rtcEngine.setExtensionProperty(
+        provider: 'FaceUnity',
+        extension: 'Effect',
+        key: 'fuItemSetParam',
+        value: jsonEncode({
+          'obj_handle': bundleRealPath,
+          'name': "color_level",
+          'value': colorValue,
+        }));
+    //
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!_isReadyPreview) {
       return Container();
+    } else {
+      return Stack(
+        alignment: AlignmentDirectional.bottomEnd,
+        children: [
+          AgoraVideoView(
+              controller: VideoViewController(
+            rtcEngine: _rtcEngine,
+            canvas: const VideoCanvas(uid: 0),
+          )),
+          Flex(
+            direction: Axis.horizontal,
+            children: [
+              Expanded(flex: 1, child: Container()),
+              Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    'Agora RTC SDK: $rtcEngineVersion($rtcEnginebuild)',
+                    textAlign: TextAlign.left,
+                    style: const TextStyle(
+                        color: Colors.white70, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'FaceUnity SDK: $fuVersion',
+                    textAlign: TextAlign.left,
+                    style: const TextStyle(
+                        color: Colors.white70, fontWeight: FontWeight.bold),
+                  ),
+                  _enableAITracking
+                      ? Text(
+                          "faces: $_facesNum",
+                          textAlign: TextAlign.left,
+                          style: const TextStyle(
+                              color: Colors.white70,
+                              fontWeight: FontWeight.bold),
+                        )
+                      : Container(),
+                  _enableAITracking
+                      ? Text(
+                          "hands: $_handsNum",
+                          textAlign: TextAlign.left,
+                          style: const TextStyle(
+                              color: Colors.white70,
+                              fontWeight: FontWeight.bold),
+                        )
+                      : Container(),
+                  _enableAITracking
+                      ? Text(
+                          "people: $_peopleNum",
+                          textAlign: TextAlign.left,
+                          style: const TextStyle(
+                              color: Colors.white70,
+                              fontWeight: FontWeight.bold),
+                        )
+                      : Container(),
+                  TextButton(
+                    style: TextButton.styleFrom(foregroundColor: Colors.blue),
+                    onPressed: () async {
+                      setState(() {
+                        _enableExtension = !_enableExtension;
+                      });
+
+                      await _rtcEngine.enableExtension(
+                          provider: "FaceUnity",
+                          extension: "Effect",
+                          enable: _enableExtension);
+                    },
+                    child: Text(_enableExtension
+                        ? 'disableExtension'
+                        : 'enableExtension'),
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(foregroundColor: Colors.blue),
+                    onPressed: () async {
+                      setState(() {
+                        _enableAITracking = !_enableAITracking;
+                      });
+
+                      if (_enableAITracking) {
+                        await _rtcEngine.setExtensionProperty(
+                            provider: 'FaceUnity',
+                            extension: 'Effect',
+                            key: 'fuSetMaxFaces',
+                            value: jsonEncode({
+                              'n': 5,
+                            }));
+
+                        await _rtcEngine.setExtensionProperty(
+                            provider: 'FaceUnity',
+                            extension: 'Effect',
+                            key: 'fuIsTracking',
+                            value: jsonEncode({
+                              'enable': true,
+                            }));
+
+                        await _rtcEngine.setExtensionProperty(
+                            provider: 'FaceUnity',
+                            extension: 'Effect',
+                            key: 'fuHumanProcessorGetNumResults',
+                            value: jsonEncode({
+                              'enable': true,
+                            }));
+
+                        await _rtcEngine.setExtensionProperty(
+                            provider: 'FaceUnity',
+                            extension: 'Effect',
+                            key: 'fuHumanProcessorSetMaxHumans',
+                            value: jsonEncode({
+                              'max_humans': 5,
+                            }));
+
+                        await _rtcEngine.setExtensionProperty(
+                            provider: 'FaceUnity',
+                            extension: 'Effect',
+                            key: 'fuHandDetectorGetResultNumHands',
+                            value: jsonEncode({
+                              'enable': true,
+                            }));
+                      }
+                    },
+                    child: Text(_enableAITracking
+                        ? 'disableAITracking'
+                        : 'enableAITracking'),
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(foregroundColor: Colors.cyan),
+                    onPressed: () async {
+                      setState(() {
+                        _enableSticker = !_enableSticker;
+                      });
+
+                      if (_enableSticker) {
+                        _enableStickerEffect();
+                      } else {
+                        _disableStickerEffect();
+                      }
+                    },
+                    child: Text(
+                        _enableSticker ? 'disableSticker' : 'enableSticker'),
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(foregroundColor: Colors.yellow),
+                    onPressed: () async {
+                      setState(() {
+                        _enableComposer = !_enableComposer;
+                      });
+
+                      if (_enableComposer) {
+                        _enableComposerEffect();
+                        _setComposerStuff(_colorLevel, _filterLevel);
+                      } else {
+                        _disableComposerEffect();
+                      }
+                    },
+                    child: Text(
+                        _enableComposer ? 'disableComposer' : 'enableComposer'),
+                  ),
+                  const Text('Color Level:', textAlign: TextAlign.left),
+                  Slider(
+                      value: _colorLevel,
+                      onChanged: _enableComposer
+                          ? (double value) async {
+                              setState(() {
+                                _colorLevel = value;
+                              });
+
+                              _setComposerStuff(_colorLevel, _filterLevel);
+                            }
+                          : null),
+                  const Text('Filter Level:', textAlign: TextAlign.left),
+                  Slider(
+                      value: _filterLevel,
+                      onChanged: _enableComposer
+                          ? (double value) async {
+                              setState(() {
+                                _filterLevel = value;
+                              });
+
+                              _setComposerStuff(_colorLevel, _filterLevel);
+                            }
+                          : null),
+                ],
+              ),
+            ],
+          ),
+        ],
+      );
     }
-
-    return Stack(
-      alignment: AlignmentDirectional.bottomEnd,
-      children: [
-        AgoraVideoView(
-            controller: VideoViewController(
-          rtcEngine: _rtcEngine,
-          canvas: const VideoCanvas(uid: 0),
-        )),
-        Flex(
-          direction: Axis.horizontal,
-          children: [
-            Expanded(flex: 1, child: Container()),
-            Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  'Agora RTC SDK: $rtcEngineVersion($rtcEnginebuild)',
-                  textAlign: TextAlign.left,
-                  style: const TextStyle(
-                      color: Colors.white70, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'FaceUnity SDK: $fuVersion',
-                  textAlign: TextAlign.left,
-                  style: const TextStyle(
-                      color: Colors.white70, fontWeight: FontWeight.bold),
-                ),
-                _enableAITracking
-                    ? Text(
-                        "faces: $_facesNum",
-                        textAlign: TextAlign.left,
-                        style: const TextStyle(
-                            color: Colors.white70, fontWeight: FontWeight.bold),
-                      )
-                    : Container(),
-                _enableAITracking
-                    ? Text(
-                        "hands: $_handsNum",
-                        textAlign: TextAlign.left,
-                        style: const TextStyle(
-                            color: Colors.white70, fontWeight: FontWeight.bold),
-                      )
-                    : Container(),
-                _enableAITracking
-                    ? Text(
-                        "people: $_peopleNum",
-                        textAlign: TextAlign.left,
-                        style: const TextStyle(
-                            color: Colors.white70, fontWeight: FontWeight.bold),
-                      )
-                    : Container(),
-                TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Colors.blue),
-                  onPressed: () async {
-                    setState(() {
-                      _enableExtension = !_enableExtension;
-                    });
-
-                    await _rtcEngine.enableExtension(
-                        provider: "FaceUnity",
-                        extension: "Effect",
-                        enable: _enableExtension);
-                  },
-                  child: Text(_enableExtension
-                      ? 'disableExtension'
-                      : 'enableExtension'),
-                ),
-                TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Colors.blue),
-                  onPressed: () async {
-                    setState(() {
-                      _enableAITracking = !_enableAITracking;
-                    });
-
-                    if (_enableAITracking) {
-                      await _rtcEngine.setExtensionProperty(
-                          provider: 'FaceUnity',
-                          extension: 'Effect',
-                          key: 'fuSetMaxFaces',
-                          value: jsonEncode({
-                            'n': 5,
-                          }));
-
-                      await _rtcEngine.setExtensionProperty(
-                          provider: 'FaceUnity',
-                          extension: 'Effect',
-                          key: 'fuIsTracking',
-                          value: jsonEncode({
-                            'enable': true,
-                          }));
-
-                      await _rtcEngine.setExtensionProperty(
-                          provider: 'FaceUnity',
-                          extension: 'Effect',
-                          key: 'fuHumanProcessorGetNumResults',
-                          value: jsonEncode({
-                            'enable': true,
-                          }));
-
-                      await _rtcEngine.setExtensionProperty(
-                          provider: 'FaceUnity',
-                          extension: 'Effect',
-                          key: 'fuHumanProcessorSetMaxHumans',
-                          value: jsonEncode({
-                            'max_humans': 5,
-                          }));
-
-                      await _rtcEngine.setExtensionProperty(
-                          provider: 'FaceUnity',
-                          extension: 'Effect',
-                          key: 'fuHandDetectorGetResultNumHands',
-                          value: jsonEncode({
-                            'enable': true,
-                          }));
-                    }
-                  },
-                  child: Text(_enableAITracking
-                      ? 'disableAITracking'
-                      : 'enableAITracking'),
-                ),
-                TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Colors.cyan),
-                  onPressed: () async {
-                    setState(() {
-                      _enableSticker = !_enableSticker;
-                    });
-
-                    if (_enableSticker) {
-                      _enableStickerEffect(
-                          'Resource/effect/normal/cat_sparks.bundle');
-                    } else {
-                      _disableStickerEffect(
-                          'Resource/effect/normal/cat_sparks.bundle');
-                    }
-                  },
-                  child:
-                      Text(_enableSticker ? 'disableSticker' : 'enableSticker'),
-                ),
-                TextButton(
-                  style: TextButton.styleFrom(foregroundColor: Colors.yellow),
-                  onPressed: () async {
-                    setState(() {
-                      _enableComposer = !_enableComposer;
-                    });
-
-                    if (_enableComposer) {
-                      _enableComposerEffect(
-                          'Resource/graphics/face_beautification.bundle');
-                      _setComposerStuff(
-                          'Resource/graphics/face_beautification.bundle',
-                          _colorLevel,
-                          _filterLevel);
-                    } else {
-                      _disableComposerEffect(
-                          'Resource/graphics/face_beautification.bundle');
-                    }
-                  },
-                  child: Text(
-                      _enableComposer ? 'disableComposer' : 'enableComposer'),
-                ),
-                const Text('Color Level:', textAlign: TextAlign.left),
-                Slider(
-                    value: _colorLevel,
-                    onChanged: _enableComposer
-                        ? (double value) async {
-                            setState(() {
-                              _colorLevel = value;
-                            });
-
-                            _setComposerStuff(
-                                'Resource/graphics/face_beautification.bundle',
-                                _colorLevel,
-                                _filterLevel);
-                          }
-                        : null),
-                const Text('Filter Level:', textAlign: TextAlign.left),
-                Slider(
-                    value: _filterLevel,
-                    onChanged: _enableComposer
-                        ? (double value) async {
-                            setState(() {
-                              _filterLevel = value;
-                            });
-
-                            _setComposerStuff(
-                                'Resource/graphics/face_beautification.bundle',
-                                _colorLevel,
-                                _filterLevel);
-                          }
-                        : null),
-              ],
-            ),
-          ],
-        ),
-      ],
-    );
   }
 }
