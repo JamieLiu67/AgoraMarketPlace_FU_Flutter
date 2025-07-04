@@ -303,7 +303,7 @@ class _MyHomePageState extends State<MyHomePage> {
         value: jsonEncode({
           'obj_handle': bundleRealPath,
           'name': "cheek_thinning",
-          'value': 0.5,
+          'value': 0.9,
         }));
 
     //Filter - 滤镜
@@ -370,7 +370,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         color: Colors.white70, fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    'FaceUnity SDK: $fuVersion',
+                    'FU: $fuVersion',
                     textAlign: TextAlign.left,
                     style: const TextStyle(
                         color: Colors.white70, fontWeight: FontWeight.bold),
