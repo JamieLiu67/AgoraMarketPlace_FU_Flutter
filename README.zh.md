@@ -4,7 +4,7 @@
 
 
 # 8.14.0 - 4.5.0-16k（flutter 6.5.2） 【最新版本】
-* [点击此处下载demo需要的资源文件包 - 8.14.0](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.11.1_Extension_for_Resource.tar.gz)
+* [点击此处下载demo需要的资源文件包 - 8.14.0](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.14.0_Extension_for_Resource.tar.gz)
 * [点击此处下载demo需要的Android插件aar - 8.14.0](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.14.0_Extension_for_Android_v4.5.0-16kb-pre1.tar.gz)
 * [点击此处下载demo需要的IOS插件framework - 8.14.0](https://download.agora.io/marketplace/release/Agora_Marketplace_FaceUnity_v8.14.0_Extension_for_iOS_v4.5.0-pre1.tar.gz)
 ---
