@@ -37,8 +37,9 @@ dependencies:
   cupertino_icons: ^1.0.2
 
   agora_rtc_engine: 6.5.2
-  path_provider: ^2.0.11
-  permission_handler: ^8.3.0
+  path_provider: ^2.1.4
+  permission_handler: ^11.0.0
+
   path: ^1.8.0
 
   image: ^4.0.17

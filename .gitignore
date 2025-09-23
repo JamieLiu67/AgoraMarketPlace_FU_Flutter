@@ -49,3 +49,7 @@ ios/AgoraFaceUnityExtension.framework.dSYM
 
 Resource/
 pubspec.lock
+
+# FVM Version Cache
+.fvm/
+.fvmrc

@@ -26,6 +26,8 @@ const aiFaceProcessorPath = 'Resource/model/ai_face_processor.bundle';
 const aiHandProcessorPath = 'Resource/model/ai_hand_processor.bundle';
 const aiHumanProcessorPath = 'Resource/model/ai_human_processor.bundle';
 const aiTypePath = 'Resource/others/aitype.bundle';
+const makeupPath1 = 'Resource/makeup/combination_bundle/guofeng.bundle';
+const makeupPath2 = 'Resource/makeup/combination_bundle/hunxue.bundle';
 
 void main() {
   runApp(const MyApp());
@@ -67,6 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _enableAITracking = false;
   bool _enableSticker = false;
   bool _enableComposer = false;
+  bool _enableMakeup = false;
 
   double _colorLevel = 0.5;
   double _filterLevel = 0.5;
@@ -259,6 +262,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _enableStickerEffect() async {
     final stickerRealPath = await _copyAsset(stickerPath);
+    // final makeupRealPath1 = await _copyAsset(makeupPath1);
     await _rtcEngine.setExtensionProperty(
         provider: 'FaceUnity',
         extension: 'Effect',
@@ -268,11 +272,32 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _disableStickerEffect() async {
     final stickerRealPath = await _copyAsset(stickerPath);
+    // final makeupRealPath1 = await _copyAsset(makeupPath1);
     await _rtcEngine.setExtensionProperty(
         provider: 'FaceUnity',
         extension: 'Effect',
         key: 'fuDestroyItem',
         value: jsonEncode({'item': stickerRealPath}));
+  }
+
+  Future<void> _enableMakeupEffect() async {
+    // final stickerRealPath = await _copyAsset(stickerPath);
+    final makeupRealPath2 = await _copyAsset(makeupPath2);
+    await _rtcEngine.setExtensionProperty(
+        provider: 'FaceUnity',
+        extension: 'Effect',
+        key: 'fuCreateItemFromPackage',
+        value: jsonEncode({'data': makeupRealPath2}));
+  }
+
+  Future<void> _disableMakeupEffect() async {
+    // final stickerRealPath = await _copyAsset(stickerPath);
+    final makeupRealPath2 = await _copyAsset(makeupPath2);
+    await _rtcEngine.setExtensionProperty(
+        provider: 'FaceUnity',
+        extension: 'Effect',
+        key: 'fuDestroyItem',
+        value: jsonEncode({'item': makeupRealPath2}));
   }
 
   Future<void> _enableComposerEffect() async {
@@ -470,6 +495,22 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Text(_enableAITracking
                         ? 'disableAITracking'
                         : 'enableAITracking'),
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(foregroundColor: Colors.cyan),
+                    onPressed: () async {
+                      setState(() {
+                        _enableMakeup = !_enableMakeup;
+                      });
+
+                      if (_enableMakeup) {
+                        _enableMakeupEffect();
+                      } else {
+                        _disableMakeupEffect();
+                      }
+                    },
+                    child:
+                        Text(_enableMakeup ? 'disableMakeup' : 'enableMakeup'),
                   ),
                   TextButton(
                     style: TextButton.styleFrom(foregroundColor: Colors.cyan),
